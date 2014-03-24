@@ -47,7 +47,7 @@ run 'rm README.rdoc'
 
 # Add template data to README.md
 file 'README.md', <<-README.strip_heredoc.chomp
-  # #{app_name.split('_').map(&:capitalize).join(' ')}
+  # #{app_name.split(/_|-/).map(&:capitalize).join(' ')}
 README
 
 # Add LICENSE
