@@ -322,10 +322,37 @@ File.open('.gitignore', 'a') do |f|
   f.write "\n# Ignore secrets.yml\nsecrets.yml"
 end
 
+# Add STACK description file
+file 'STACK', <<-STACK.strip_heredoc.chomp
+  This generator has set up the following stack:
+
+    1. Testing
+      * RSpec
+      * Capybara
+      * Database Cleaner
+      * SimpleCov
+      * Guard
+    2. Frontend
+      * Bootstrap
+      * Disabled Turbolinks
+      * Google Analytics
+      * Precompiled assets in production
+    3. Gem groups set up for easy Heroku deployment
+      * Postgres will work out of the box. No configuration necessary.
+
+  TODO:
+    1. An MIT License file has been created for you
+      * Add your name and the year
+    2. A README.md file has been started for you
+      * Add relavent information and screenshots for your app
+    3. Google Analytics is set up to track your app
+      * You will need to add your analytics code to `config/secrets.yml`
+      * Set up an application on Google Analytics to get this code.
+STACK
+
 # Initialize git repository and make initial commit
 git :init
 git add: "."
 git commit: %Q{ -m 'Initial commit' }
 
-# TODO: Stack description file
 # TODO: README guidelines
