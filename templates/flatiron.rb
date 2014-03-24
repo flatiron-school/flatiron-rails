@@ -1,4 +1,20 @@
-# add gems
+# remove sqlite3 from default gem group
+File.open("Gemfile", "r+") do |f|
+  out = ""
+  f.each do |line|
+    if line =~ /# Use sqlite3 as the database for Active Record/
+      out << ""
+    elsif line =~ /gem 'sqlite3'/
+      out << "\n"
+    else
+      out << line
+    end
+  end
+  f.pos = 0
+  f.print out.chomp
+  f.truncate(f.pos)
+end
+
 gem_group :test, :development do
   gem 'rspec-rails'
   gem 'capybara'
@@ -9,11 +25,13 @@ gem_group :test, :development do
   gem 'factory_girl_rails'
   gem 'simplecov'
   gem 'database_cleaner'
+  gem 'sqlite3'
 end
 
 gem_group :production do
   gem 'pg'
   gem 'google-analytics-rails'
+  gem 'rails_12factor'
 end
 
 gem 'bootstrap-sass', '~> 3.1.1'
@@ -311,5 +329,12 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
+# initialize git repository and make initial commit
+git :init
+git add: "."
+git commit: %Q{ -m 'Initial commit' }
+
 # TODO: Stack description file
-# TODO: README guidelinds
+# TODO: README guidelines
+# TODO: change assets precomile to true
+# TODO: Add secrets.yml to .gitignore
