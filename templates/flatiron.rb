@@ -311,8 +311,5 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# describe application stack
-
-file '', <<-STACK.strip_heredoc.chomp
-  
-STACK
+# TODO: Stack description file
+# TODO: README guidelinds
