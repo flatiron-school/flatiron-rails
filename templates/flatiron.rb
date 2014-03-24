@@ -1,12 +1,12 @@
 # Prevent automatic run of bundle install
 def run_bundle ; end
 
-# Remove sqlite3 from default gem group and set Ruby version to 2.1.1
+# Remove sqlite3 from default gem group and set Ruby version to 2.1.0
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /source 'https:\/\/rubygems.org'/
-      out << line + "\nruby \"2.1.1\"\n"
+      out << line + "\nruby \"2.1.0\"\n"
     elsif line =~ /# Use sqlite3 as the database for Active Record/
       out << ""
     elsif line =~ /gem 'sqlite3'/
