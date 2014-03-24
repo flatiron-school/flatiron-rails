@@ -1,4 +1,7 @@
-# remove sqlite3 from default gem group
+# Prevent automatic run of bundle install
+def run_bundle ; end
+
+# Remove sqlite3 from default gem group
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
@@ -36,10 +39,15 @@ end
 
 gem 'bootstrap-sass', '~> 3.1.1'
 
-# rename README.rdoc to README.md
-run 'mv README.rdoc README.md'
+# Delete README.rdoc
+run 'rm README.rdoc'
 
-# add LICENSE
+# Add template data to README.md
+file 'README.md', <<-README.strip_heredoc.chomp
+  # #{app_name.split('_').map(&:capitalize).join(' ')}
+README
+
+# Add LICENSE
 file 'LICENSE', <<-MIT.strip_heredoc.chomp
   The MIT License (MIT)
 
@@ -64,7 +72,7 @@ file 'LICENSE', <<-MIT.strip_heredoc.chomp
   SOFTWARE.
 MIT
 
-# set rails version to 4.1.0.rc1
+# Set Rails version to 4.1.0.rc1
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
@@ -79,7 +87,7 @@ File.open("Gemfile", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# disable turbolinks
+# Disable Turbolinks
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
@@ -122,11 +130,13 @@ File.open("app/views/layouts/application.html.erb", "r+") do |f|
   f.truncate(f.pos)
 end
 
-system("bundle > /dev/null")
+# Bundle
+system("bundle")
 
+# Generate RSpec files
 generate(:"rspec:install")
 
-# edit spec/spec_helper.rb
+# Edit spec/spec_helper.rb
 File.open("spec/spec_helper.rb", "r+") do |f|
   out = ""
   f.each do |line|
@@ -171,17 +181,17 @@ File.open("spec/spec_helper.rb", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# make spec/features directory
+# Make spec/features directory
 run('mkdir -p spec/features')
 run('touch spec/features/.keep')
 
-# create feature_helper.rb
+# Create feature_helper.rb
 file 'spec/feature_helper.rb', <<-CODE.strip_heredoc.chomp
   require 'spec_helper'
   require 'capybara/rails'
 CODE
 
-# setup Guardfile
+# Setup Guardfile
 file 'Guardfile', %q(
   # guard 'rails' do
   #   watch('Gemfile.lock')
@@ -211,7 +221,7 @@ file 'Guardfile', %q(
   end
 ).strip.gsub(/^ {2}/, '')
 
-# set up Google Analytics
+# Set up Google Analytics
 environment 'GA.tracker = Rails.application.secrets.google_analytics_code', env: 'production'
 
 File.open("app/views/layouts/application.html.erb", "r+") do |f|
@@ -244,10 +254,10 @@ File.open("config/secrets.yml", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# set up sprockets_better_errors
+#Sset up sprockets_better_errors
 environment 'config.assets.raise_production_errors = true', env: 'development'
 
-# turn on precompile assets in production
+# Turn on precompile assets in production
 File.open("config/environments/production.rb", "r+") do |f|
   out = ""
   f.each do |line|
@@ -262,7 +272,7 @@ File.open("config/environments/production.rb", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# set up Bootstrap
+# Set up Bootstrap
 inside('app/assets/stylesheets') do
   run "mv application.css application.css.scss"
 end
@@ -306,12 +316,12 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# add secrets.yml to .gitignore
+# Add secrets.yml to .gitignore
 File.open('.gitignore', 'a') do |f|
   f.write "\n# Ignore secrets.yml\nsecrets.yml"
 end
 
-# initialize git repository and make initial commit
+# Initialize git repository and make initial commit
 git :init
 git add: "."
 git commit: %Q{ -m 'Initial commit' }
