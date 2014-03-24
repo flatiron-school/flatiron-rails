@@ -230,20 +230,7 @@ File.open("app/views/layouts/application.html.erb", "r+") do |f|
   f.each do |line|
     if line =~ /<%= csrf_meta_tags %>/
       out << "#{line}"
-      out << <<-GOOGLE.gsub(/^ {6}/, '')
-        <% if Rails.env.production? %>
-          <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-            ga('create', '<%= Rails.application.secrets.google_analytics_code %>', '<%= Rails.application.secrets.google_analytics_site_url %>');
-            ga('send', 'pageview');
-
-          </script>
-        <% end %>
-      GOOGLE
+      out << "  <%= analytics_init if Rails.env.production? %>\n"
     else
       out << line
     end
@@ -259,7 +246,6 @@ File.open("config/secrets.yml", "r+") do |f|
     if line =~ /production:/
       out << "#{line}"
       out << "  google_analytics_code: 'YOUR CODE HERE'\n"
-      out << "  google_analytics_site_url: 'yoursite.com'\n"
     else
       out << line
     end
@@ -355,8 +341,8 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
     2. A README.md file has been started for you
       * Add relavent information and screenshots for your app
     3. Google Analytics is set up to track your app
-      * You will need to add your analytics tracker code and site URL to `config/secrets.yml`
-      * Set up an application on Google Analytics to get this code.
+      * Set up an application on Google Analytics
+      * You will need to add your analytics tracking code to `config/secrets.yml`
 STACK
 
 # Initialize git repository and make initial commit
