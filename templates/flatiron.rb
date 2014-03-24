@@ -317,11 +317,6 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
-# Add secrets.yml to .gitignore
-File.open('.gitignore', 'a') do |f|
-  f.write "\n# Ignore secrets.yml\nsecrets.yml"
-end
-
 # Add STACK description file
 file 'STACK', <<-STACK.strip_heredoc.chomp
   This generator has set up the following stack:
@@ -355,4 +350,4 @@ git :init
 git add: "."
 git commit: %Q{ -m 'Initial commit' }
 
-# TODO: README guidelines
+# TODO: Add ruby 2.1.0 to gemfile
