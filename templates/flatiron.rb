@@ -1,11 +1,13 @@
 # Prevent automatic run of bundle install
 def run_bundle ; end
 
-# Remove sqlite3 from default gem group
+# Remove sqlite3 from default gem group and set Ruby version to 2.1.0
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
-    if line =~ /# Use sqlite3 as the database for Active Record/
+    if line =~ /source 'https:\/\/rubygems.org'/
+      out << line + "\nruby \"2.1.0\"\n"
+    elsif line =~ /# Use sqlite3 as the database for Active Record/
       out << ""
     elsif line =~ /gem 'sqlite3'/
       out << "\n"
@@ -92,9 +94,7 @@ end
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
-    if line =~ /gem 'turbolinks'/
-      out << "# #{line}"
-    else
+    unless line =~ /gem 'turbolinks'/ || line =~ /# Turbolinks/
       out << line
     end
   end
@@ -106,9 +106,7 @@ end
 File.open("app/assets/javascripts/application.js", "r+") do |f|
   out = ""
   f.each do |line|
-    if line =~ /\/\/= require turbolinks/
-      out << "// require turbolinks\n"
-    else
+    unless line =~ /\/\/= require turbolinks/
       out << line
     end
   end
@@ -343,6 +341,12 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
     3. Google Analytics is set up to track your app
       * Set up an application on Google Analytics
       * You will need to add your analytics tracking code to `config/secrets.yml`
+
+  Deploying to Heroku:
+    1. `heroku create <appname>`
+    2. `git push heroku master`
+    3. `heroku run rake db:migrate`
+    4. `heroku open`
 STACK
 
 # Initialize git repository and make initial commit
