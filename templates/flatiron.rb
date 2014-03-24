@@ -212,33 +212,7 @@ file 'Guardfile', %q(
 ).strip.gsub(/^ {2}/, '')
 
 # set up Google Analytics
-File.open("config/environments/production.rb", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /config.active_record.dump_schema_after_migration = false/
-      out << "#{line}\n  GA.tracker = ENV['GOOGLE_ANALYTICS_CODE']\n"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
-
-File.open("config/environments/production.rb", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /config.active_record.dump_schema_after_migration = false/
-      out << "#{line}\n  GA.tracker = Rails.application.secrets.google_analytics_code\n"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
+environment 'GA.tracker = Rails.application.secrets.google_analytics_code', env: 'production'
 
 File.open("app/views/layouts/application.html.erb", "r+") do |f|
   out = ""
@@ -271,11 +245,14 @@ File.open("config/secrets.yml", "r+") do |f|
 end
 
 # set up sprockets_better_errors
-File.open("config/environments/development.rb", "r+") do |f|
+environment 'config.assets.raise_production_errors = true', env: 'development'
+
+# turn on precompile assets in production
+File.open("config/environments/production.rb", "r+") do |f|
   out = ""
   f.each do |line|
-    if line =~ /# config.action_view.raise_on_missing_translations = true/
-      out << "#{line}\n  config.assets.raise_production_errors = true\n"
+    if line =~ /config.assets.compile = false/
+      out << "  config.assets.compile = true\n"
     else
       out << line
     end
@@ -329,6 +306,11 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
+# add secrets.yml to .gitignore
+File.open('.gitignore', 'a') do |f|
+  f.write "\n# Ignore secrets.yml\nsecrets.yml"
+end
+
 # initialize git repository and make initial commit
 git :init
 git add: "."
@@ -336,5 +318,3 @@ git commit: %Q{ -m 'Initial commit' }
 
 # TODO: Stack description file
 # TODO: README guidelines
-# TODO: change assets precomile to true
-# TODO: Add secrets.yml to .gitignore
