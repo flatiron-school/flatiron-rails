@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'flatiron_rails'
+FlatironRails.run
