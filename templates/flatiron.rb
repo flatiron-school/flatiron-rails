@@ -29,6 +29,7 @@ gem_group :test, :development do
   gem 'simplecov'
   gem 'database_cleaner'
   gem 'sqlite3'
+  gem 'pry'
 end
 
 gem_group :production do
