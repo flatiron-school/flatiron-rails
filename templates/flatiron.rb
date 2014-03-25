@@ -350,12 +350,13 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
     1. Create your app on Ninefold
     2. Add the given SSH key to your account on GitHub
     3. Choose the option for a single-server app
-    4. Change the name of the Environment Variable from SECRET_TOKEN to SECRET_KEY_BASE
-    4. Click deploy (it will probably fail)
-    5. Copy the relevant database information from the Database tab
-    6. Paste that info in your `config/secrets.yml` file
-    7. Push your changes
-    8. Re-deploy on Ninefold
+    4. Choose Ruby 2.1.0
+    5. Change the name of the Environment Variable from SECRET_TOKEN to SECRET_KEY_BASE
+    6. Click deploy (it will probably fail)
+    7. Copy the relevant database information from the Database tab
+    8. Paste that info in your `config/secrets.yml` file
+    9. Push your changes
+    10. Re-deploy on Ninefold
 STACK
 
 # Helper methods for Ninefold setup
@@ -409,7 +410,7 @@ def remove_12_factor
   File.open("Gemfile", "r+") do |f|
     out = ""
     f.each do |line|
-      unless line =~ /gem 'rails_12factor'/
+      unless line =~ /gem "rails_12factor"/
         out << line
       end
     end
