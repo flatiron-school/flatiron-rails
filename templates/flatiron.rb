@@ -129,8 +129,29 @@ File.open("app/views/layouts/application.html.erb", "r+") do |f|
   f.truncate(f.pos)
 end
 
+# Optionally set up Devise
+devise = false
+
+if yes?("Use Devise?")
+  devise = true
+  gem 'devise'
+end
+
 # Bundle
 system("bundle")
+
+if devise
+  run('rails generate devise:install')
+  if yes?("Setup user model for Devise?")
+    model_name = ask("What do you want to call it (default=User)?").chomp.capitalize
+    if model_name.size == 0
+      model_name = "User"
+    end
+
+    run("rails generate devise #{model_name}")
+    rake("db:migrate")
+  end
+end
 
 # Generate RSpec files
 generate(:"rspec:install")
