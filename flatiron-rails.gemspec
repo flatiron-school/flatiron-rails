@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
   s.name        = 'flatiron-rails'
-  s.version     = '0.0.4'
+  s.version     = '0.0.5'
   s.executables << 'flatiron-rails'
-  s.date        = '2014-03-24'
+  s.date        = '2014-03-25'
   s.summary     = "flatiron-rails gem"
   s.description = "Sets up a rails application using the default Flatiron School stack."
   s.authors     = ["Arel English", "Logan Hasson", "Katie Hoffman"]

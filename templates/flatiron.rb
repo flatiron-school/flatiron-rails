@@ -315,18 +315,6 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
-file 'bin/deploy', <<-DEPLOY.strip_heredoc.chomp
-  #!/usr/bin/env ruby
-  if ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[1]
-    puts <<-HELP.gsub(/^ {6}/, '')
-    Usage:
-      flatiron-rails <app_name>
-    HELP
-  else
-    system("heroku create #{ARGV[0]} && git push heroku master && heroku run rake db:migrate && heroku open")
-  end
-DEPLOY
-
 # Add STACK description file
 file 'STACK', <<-STACK.strip_heredoc.chomp
   This generator has set up the following stack:
@@ -355,10 +343,7 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
       * You will need to add your analytics tracking code to `config/secrets.yml`
 
   Deploying to Heroku:
-    1. `heroku create <appname>`
-    2. `git push heroku master`
-    3. `heroku run rake db:migrate`
-    4. `heroku open`
+    1. `bin/deploy <app_name>`
 
   Deploying to Ninefold:
     1. Create your app on Ninefold
@@ -423,6 +408,22 @@ end
 if yes?("Set up for Ninefold instead of Heroku? [y/N]")
   setup_database_yml_for_ninefold
   setup_secrets_yml_for_ninefold
+else
+  file 'bin/deploy', <<-DEPLOY.strip_heredoc.chomp
+    #!/usr/bin/env ruby
+    if ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[1]
+      puts <<-HELP.gsub(/^ {6}/, '')
+      Usage:
+        flatiron-rails <app_name>
+      HELP
+    else
+      system("heroku create \#{ARGV[0]} && git push heroku master && heroku run rake db:migrate && heroku open")
+    end
+  DEPLOY
+
+  inside('bin') do
+    run "chmod +x deploy"
+  end
 end
 
 # Initialize git repository and make initial commit
