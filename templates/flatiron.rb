@@ -315,6 +315,18 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
   f.truncate(f.pos)
 end
 
+file 'bin/deploy', <<-DEPLOY.strip_heredoc.chomp
+  #!/usr/bin/env ruby
+  if ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[1]
+    puts <<-HELP.gsub(/^ {6}/, '')
+    Usage:
+      flatiron-rails <app_name>
+    HELP
+  else
+    system("heroku create #{ARGV[0]} && git push heroku master && heroku run rake db:migrate && heroku open")
+  end
+DEPLOY
+
 # Add STACK description file
 file 'STACK', <<-STACK.strip_heredoc.chomp
   This generator has set up the following stack:
@@ -349,7 +361,15 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
     4. `heroku open`
 
   Deploying to Ninefold:
-    1. TODO ENTER INSTRUCTIONS HERE
+    1. Create your app on Ninefold
+    2. Add the given SSH key to your account on GitHub
+    3. Choose the option for a single-server app
+    4. Change the name of the Environment Variable from SECRET_TOKEN to SECRET_KEY_BASE
+    4. Click deploy (it will probably fail)
+    5. Copy the relevant database information from the Database tab
+    6. Paste that info in your `config/secrets.yml` file
+    7. Push your changes
+    8. Re-deploy on Ninefold
 STACK
 
 # Helper methods for Ninefold setup
@@ -400,7 +420,7 @@ def setup_secrets_yml_for_ninefold
 end
 
 # Change setup for Ninefold
-if yes?("Set up for Ninefold instead of Heroku?")
+if yes?("Set up for Ninefold instead of Heroku? [y/N]")
   setup_database_yml_for_ninefold
   setup_secrets_yml_for_ninefold
 end
@@ -409,3 +429,5 @@ end
 git :init
 git add: "."
 git commit: %Q{ -m 'Initial commit' }
+
+# TODO: Remove 12_factor for ninefold
