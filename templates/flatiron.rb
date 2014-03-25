@@ -1,16 +1,51 @@
 # Prevent automatic run of bundle install
 def run_bundle ; end
 
+# Helper method to write to secrets.yml
+def add_secret_for(options)
+  key = "#{options.first[0].to_s}"
+  value = options.first[1]
+  env = options[:env].to_s
+
+  File.open("config/secrets.yml", "r+") do |f|
+    out = ""
+    f.each do |line|
+      if line =~ /#{env}:/
+        out << "#{line}"
+        out << "  #{key}: #{value}\n"
+      else
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
+# Helper method to remove gems from Gemfile
+def remove_from_gemfile(gem_name)
+  File.open("Gemfile", "r+") do |f|
+    out = ""
+    f.each do |line|
+      unless line =~ /#{gem_name}/i
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
 # Remove sqlite3 from default gem group and set Ruby version to 2.1.0
+remove_from_gemfile("sqlite3")
+
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /source 'https:\/\/rubygems.org'/
       out << line + "\nruby \"2.1.0\"\n"
-    elsif line =~ /# Use sqlite3 as the database for Active Record/
-      out << ""
-    elsif line =~ /gem 'sqlite3'/
-      out << "\n"
     else
       out << line
     end
@@ -91,17 +126,7 @@ File.open("Gemfile", "r+") do |f|
 end
 
 # Disable Turbolinks
-File.open("Gemfile", "r+") do |f|
-  out = ""
-  f.each do |line|
-    unless line =~ /gem 'turbolinks'/ || line =~ /# Turbolinks/
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
+remove_from_gemfile("turbolinks")
 
 File.open("app/assets/javascripts/application.js", "r+") do |f|
   out = ""
@@ -132,9 +157,11 @@ end
 # Optionally set up Devise
 devise = false
 
-if yes?("Use Devise?")
+if yes?("Use Devise? [y/N]")
   devise = true
   gem 'devise'
+  environment 'config.action_mailer.default_url_options = { host: Rails.application.secrets.host }', env: 'production'
+  add_secret_for(:host => 'YOUR PRODUCTION HOST URL/IP HERE', :env => 'production')
 end
 
 # Bundle
@@ -142,7 +169,7 @@ system("bundle")
 
 if devise
   run('rails generate devise:install')
-  if yes?("Setup user model for Devise?")
+  if yes?("Setup user model for Devise? [y/N]")
     model_name = ask("What do you want to call it (default=User)?").chomp.capitalize
     if model_name.size == 0
       model_name = "User"
@@ -259,22 +286,9 @@ File.open("app/views/layouts/application.html.erb", "r+") do |f|
   f.truncate(f.pos)
 end
 
-File.open("config/secrets.yml", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /production:/
-      out << "#{line}"
-      out << "  google_analytics_code: 'YOUR CODE HERE'\n"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
+add_secret_for(google_analytics_code: 'YOUR CODE HERE', env: :production)
 
-#Sset up sprockets_better_errors
+#Set up sprockets_better_errors
 environment 'config.assets.raise_production_errors = true', env: 'development'
 
 # Turn on precompile assets in production
@@ -407,45 +421,16 @@ def setup_database_yml_for_ninefold
 end
 
 def setup_secrets_yml_for_ninefold
-  File.open("config/secrets.yml", "r+") do |f|
-    out = ""
-    f.each do |line|
-      if line =~ /production:/
-        out << "#{line}"
-        out << <<-SECRETS.gsub(/^ {8}/, '')
-          ninefold_db: 'YOUR NINEFOLD DATABASE NAME HERE'
-          ninefold_user: 'NINEFOLD DATABASE USERNAME HERE'
-          ninefold_pass: 'NINEFOLD DATABASE PASSWORD HERE'
-        SECRETS
-      else
-        out << line
-      end
-    end
-    f.pos = 0
-    f.print out.chomp
-    f.truncate(f.pos)
-  end
-end
-
-def remove_12_factor
-  File.open("Gemfile", "r+") do |f|
-    out = ""
-    f.each do |line|
-      unless line =~ /gem "rails_12factor"/
-        out << line
-      end
-    end
-    f.pos = 0
-    f.print out.chomp
-    f.truncate(f.pos)
-  end
+  add_secret_for(ninefold_db: 'YOUR NINEFOLD DATABASE NAME HERE', env: :production)
+  add_secret_for(ninefold_user: 'NINEFOLD DATABASE USERNAME HERE', env: :production)
+  add_secret_for(ninefold_pass: 'NINEFOLD DATABASE PASSWORD HERE', env: :production)
 end
 
 # Change setup for Ninefold
 if yes?("Set up for Ninefold instead of Heroku? [y/N]")
   setup_database_yml_for_ninefold
   setup_secrets_yml_for_ninefold
-  remove_12_factor
+  remove_from_gemfile("rails_12factor")
 else
   file 'bin/setup', <<-SETUP.strip_heredoc.chomp
     #!/usr/bin/env ruby

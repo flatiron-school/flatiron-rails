@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'flatiron-rails'
-  s.version     = '0.0.5'
+  s.version     = '0.0.6'
   s.executables << 'flatiron-rails'
   s.date        = '2014-03-25'
   s.summary     = "flatiron-rails gem"
