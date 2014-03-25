@@ -348,12 +348,12 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
     3. `heroku run rake db:migrate`
     4. `heroku open`
 
-  Deploying to Ninefolds:
+  Deploying to Ninefold:
     1. TODO ENTER INSTRUCTIONS HERE
 STACK
 
-# Helper methods for Ninefolds setup
-def setup_database_yml_for_ninefolds
+# Helper methods for Ninefold setup
+def setup_database_yml_for_ninefold
   File.open("config/database.yml", "r+") do |f|
     out = ""
     f.each do |line|
@@ -361,9 +361,9 @@ def setup_database_yml_for_ninefolds
         out << <<-DB.gsub(/^ {8}/, '')
           adapter: postgresql
           encoding: utf8
-          database: Rails.application.secrets.ninefolds_db
-          username: Rails.application.secrets.ninefolds_user
-          password: Rails.application.secrets.ninefolds_pass
+          database: Rails.application.secrets.ninefold_db
+          username: Rails.application.secrets.ninefold_user
+          password: Rails.application.secrets.ninefold_pass
           host: localhost
           port: 5432
           pool: 10
@@ -378,16 +378,16 @@ def setup_database_yml_for_ninefolds
   end
 end
 
-def setup_secrets_yml_for_ninefolds
+def setup_secrets_yml_for_ninefold
   File.open("config/secrets.yml", "r+") do |f|
     out = ""
     f.each do |line|
       if line =~ /production:/
         out << "#{line}"
         out << <<-SECRETS.gsub(/^ {8}/, '')
-          ninefolds_db: 'YOUR NINEFOLDS DATABASE NAME HERE'
-          ninefolds_user: 'NINEFOLDS DATABASE USERNAME HERE'
-          ninefolds_pass: 'NINEFOLDS DATABASE PASSWORD HERE'
+          ninefold_db: 'YOUR NINEFOLD DATABASE NAME HERE'
+          ninefold_user: 'NINEFOLD DATABASE USERNAME HERE'
+          ninefold_pass: 'NINEFOLD DATABASE PASSWORD HERE'
         SECRETS
       else
         out << line
@@ -399,10 +399,10 @@ def setup_secrets_yml_for_ninefolds
   end
 end
 
-# Change setup for Ninefolds
-if yes?("Set up for Ninefolds instead of Heroku?")
-  setup_database_yml_for_ninefolds
-  setup_secrets_yml_for_ninefolds
+# Change setup for Ninefold
+if yes?("Set up for Ninefold instead of Heroku?")
+  setup_database_yml_for_ninefold
+  setup_secrets_yml_for_ninefold
 end
 
 # Initialize git repository and make initial commit
