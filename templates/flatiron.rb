@@ -347,11 +347,65 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
     2. `git push heroku master`
     3. `heroku run rake db:migrate`
     4. `heroku open`
+
+  Deploying to Ninefolds:
+    1. TODO ENTER INSTRUCTIONS HERE
 STACK
+
+# Helper methods for Ninefolds setup
+def setup_database_yml_for_ninefolds
+  File.open("config/database.yml", "r+") do |f|
+    out = ""
+    f.each do |line|
+      if line =~ /url:/
+        out << <<-DB.gsub(/^ {8}/, '')
+          adapter: postgresql
+          encoding: utf8
+          database: Rails.application.secrets.ninefolds_db
+          username: Rails.application.secrets.ninefolds_user
+          password: Rails.application.secrets.ninefolds_pass
+          host: localhost
+          port: 5432
+          pool: 10
+        DB
+      else
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
+def setup_secrets_yml_for_ninefolds
+  File.open("config/secrets.yml", "r+") do |f|
+    out = ""
+    f.each do |line|
+      if line =~ /production:/
+        out << "#{line}"
+        out << <<-SECRETS.gsub(/^ {8}/, '')
+          ninefolds_db: 'YOUR NINEFOLDS DATABASE NAME HERE'
+          ninefolds_user: 'NINEFOLDS DATABASE USERNAME HERE'
+          ninefolds_pass: 'NINEFOLDS DATABASE PASSWORD HERE'
+        SECRETS
+      else
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
+# Change setup for Ninefolds
+if yes?("Set up for Ninefolds instead of Heroku?")
+  setup_database_yml_for_ninefolds
+  setup_secrets_yml_for_ninefolds
+end
 
 # Initialize git repository and make initial commit
 git :init
 git add: "."
 git commit: %Q{ -m 'Initial commit' }
-
-# TODO: Add ruby 2.1.0 to gemfile
