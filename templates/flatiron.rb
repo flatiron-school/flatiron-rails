@@ -343,7 +343,8 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
       * You will need to add your analytics tracking code to `config/secrets.yml`
 
   Deploying to Heroku:
-    1. `bin/deploy <app_name>`
+    1. `bin/setup <app_name>`
+    2. `bin/deploy`
 
   Deploying to Ninefold:
     1. Create your app on Ninefold
@@ -404,24 +405,56 @@ def setup_secrets_yml_for_ninefold
   end
 end
 
+def remove_12_factor
+  File.open("Gemfile", "r+") do |f|
+    out = ""
+    f.each do |line|
+      unless line =~ /gem 'rails_12factor'/
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
 # Change setup for Ninefold
 if yes?("Set up for Ninefold instead of Heroku? [y/N]")
   setup_database_yml_for_ninefold
   setup_secrets_yml_for_ninefold
+  remove_12_factor
 else
-  file 'bin/deploy', <<-DEPLOY.strip_heredoc.chomp
+  file 'bin/setup', <<-SETUP.strip_heredoc.chomp
     #!/usr/bin/env ruby
-    if ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[1]
+    if ['-h', '--help'].include?(ARGV[0]) || ARGV[1]
       puts <<-HELP.gsub(/^ {6}/, '')
       Usage:
-        flatiron-rails <app_name>
+        flatiron-rails [<app_name>]
       HELP
+    elsif ARGV[0]
+      system("heroku create \#{ARGV[0]}")
     else
-      system("heroku create \#{ARGV[0]} && git push heroku master && heroku run rake db:migrate && heroku open")
+      system("heroku create \#{Dir.pwd.split('/').last}")
+    end
+  SETUP
+
+  file 'bin/deploy', <<-DEPLOY.strip_heredoc.chomp
+    #!/usr/bin/env ruby
+    io = IO.popen("git remote -v")
+    log = io.readlines
+
+    if !log.any? {|line| line.match(/heroku/)}
+      puts <<-ERROR.gsub(/^ {6}/, '')
+      You must run `bin/setup` first!
+      ERROR
+    else
+      system("git push heroku master && heroku run rake db:migrate && heroku open")
     end
   DEPLOY
 
   inside('bin') do
+    run "chmod +x setup"
     run "chmod +x deploy"
   end
 end
@@ -430,5 +463,3 @@ end
 git :init
 git add: "."
 git commit: %Q{ -m 'Initial commit' }
-
-# TODO: Remove 12_factor for ninefold
