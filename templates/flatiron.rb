@@ -23,12 +23,46 @@ def add_secret_for(options)
   end
 end
 
-# Helper method to remove gems from Gemfile
-def remove_from_gemfile(gem_name)
-  File.open("Gemfile", "r+") do |f|
+# Helper method to remove lines from a file
+def remove_line_from_file(file, line_to_match)
+  File.open(file, "r+") do |f|
     out = ""
     f.each do |line|
-      unless line =~ /#{gem_name}/i
+      unless line =~ /#{line_to_match}/i
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
+# Helper method to remove part of a line in a file
+def remove_part_of_line_from_file(file, line_to_remove)
+  File.open(file, "r+") do |f|
+    out = ""
+    f.each do |line|
+      if line =~ /#{line_to_remove}/
+        out << "#{line.gsub("#{line_to_remove}", '')}"
+      else
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
+# Helper method to add a line to a file
+def add_line_to_file(file, line_to_add, line_to_add_after)
+  File.open(file, "r+") do |f|
+    out = ""
+    f.each do |line|
+      if line =~ /#{line_to_add_after}/
+        out << line + line_to_add
+      else
         out << line
       end
     end
@@ -39,22 +73,10 @@ def remove_from_gemfile(gem_name)
 end
 
 # Remove sqlite3 from default gem group and set Ruby version to 2.1.0
-remove_from_gemfile("sqlite3")
+remove_line_from_file("Gemfile", "sqlite3")
+add_line_to_file("Gemfile", "\nruby \"2.1.0\"\n", "rubygems")
 
-File.open("Gemfile", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /source 'https:\/\/rubygems.org'/
-      out << line + "\nruby \"2.1.0\"\n"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
-
+# Setup gem groups
 gem_group :test, :development do
   gem 'rspec-rails'
   gem 'capybara'
@@ -75,6 +97,7 @@ gem_group :production do
   gem 'rails_12factor'
 end
 
+# Add bootstrap gem
 gem 'bootstrap-sass', '~> 3.1.1'
 
 # Delete README.rdoc
@@ -126,33 +149,9 @@ File.open("Gemfile", "r+") do |f|
 end
 
 # Disable Turbolinks
-remove_from_gemfile("turbolinks")
-
-File.open("app/assets/javascripts/application.js", "r+") do |f|
-  out = ""
-  f.each do |line|
-    unless line =~ /\/\/= require turbolinks/
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
-
-File.open("app/views/layouts/application.html.erb", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /, 'data-turbolinks-track' => true/
-      out << "#{line.gsub(", 'data-turbolinks-track' => true", '')}"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
+remove_line_from_file("Gemfile", "turbolinks")
+remove_line_from_file("app/assets/javascripts/application.js", "turbolinks")
+remove_part_of_line_from_file("app/views/layouts/application.html.erb", ", 'data-turbolinks-track' => true")
 
 # Optionally set up Devise
 devise = false
@@ -270,22 +269,7 @@ file 'Guardfile', %q(
 
 # Set up Google Analytics
 environment 'GA.tracker = Rails.application.secrets.google_analytics_code', env: 'production'
-
-File.open("app/views/layouts/application.html.erb", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /<%= csrf_meta_tags %>/
-      out << "#{line}"
-      out << "  <%= analytics_init if Rails.env.production? %>\n"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
-end
-
+add_line_to_file("app/views/layouts/application.html.erb", "  <%= analytics_init if Rails.env.production? %>\n", "<%= csrf_meta_tags %>")
 add_secret_for(google_analytics_code: 'YOUR CODE HERE', env: :production)
 
 #Set up sprockets_better_errors
@@ -311,26 +295,18 @@ inside('app/assets/stylesheets') do
   run "mv application.css application.css.scss"
 end
 
-File.open("app/assets/stylesheets/application.css.scss", "r+") do |f|
-  out = ""
-  f.each do |line|
-    if line =~ /\*= require_self/
-      out << "#{line}"
-      out << " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.eot\"\n"
-      out << " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.woff\"\n"
-      out << " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.ttf\"\n"
-      out << " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.svg\"\n"
-    elsif line =~ /\*\//
-      out << "#{line}"
-      out << "@import \"bootstrap\";"
-    else
-      out << line
-    end
-  end
-  f.pos = 0
-  f.print out.chomp
-  f.truncate(f.pos)
+depend_on_lines = [
+  " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.svg\"\n",
+  " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.ttf\"\n",
+  " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.woff\"\n",
+  " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.eot\"\n"
+]
+
+depend_on_lines.each do |line|
+  add_line_to_file("app/assets/stylesheets/application.css.scss", line, /\*= require_self/)
 end
+
+add_line_to_file("app/assets/stylesheets/application.css.scss", "@import \"bootstrap\";", /\*\//)
 
 File.open("app/assets/javascripts/application.js", "r+") do |f|
   out = ""
@@ -430,7 +406,7 @@ end
 if yes?("Set up for Ninefold instead of Heroku? [y/N]")
   setup_database_yml_for_ninefold
   setup_secrets_yml_for_ninefold
-  remove_from_gemfile("rails_12factor")
+  remove_line_from_file("Gemfile", "rails_12factor")
 else
   file 'bin/setup', <<-SETUP.strip_heredoc.chomp
     #!/usr/bin/env ruby
