@@ -354,7 +354,9 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
       * You will need to add your analytics tracking code to `config/secrets.yml`
 
   Deploying to Heroku:
-    1. `bin/setup <app_name>`
+    1. `bin/setup [<app_name>]`
+      * <app_name> is optional. It will, by default, attempt to create an
+      app on Heroku using your Rails application name.
     2. `bin/deploy`
 
   Deploying to Ninefold:
@@ -413,7 +415,7 @@ else
     if ['-h', '--help'].include?(ARGV[0]) || ARGV[1]
       puts <<-HELP.gsub(/^ {6}/, '')
       Usage:
-        flatiron-rails [<app_name>]
+        bin/setup [<app_name>]
       HELP
     elsif ARGV[0]
       system("heroku create \#{ARGV[0]}")
@@ -439,6 +441,15 @@ else
   inside('bin') do
     run "chmod +x setup"
     run "chmod +x deploy"
+  end
+
+  begin
+    heroku = IO.popen("heroku")
+  rescue
+    if yes?("It looks like you don't have Heroku installed yet. Install now? [y/N]")
+      system("brew install heroku")
+      system("heroku login")
+    end
   end
 end
 
