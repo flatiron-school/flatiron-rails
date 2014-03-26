@@ -74,7 +74,9 @@ end
 
 # Remove sqlite3 from default gem group and set Ruby version to 2.1.0
 remove_line_from_file("Gemfile", "sqlite3")
-system("rvm --ruby-version use 2.1.0")
+file '.ruby-version', <<-RVM.strip_heredoc.chomp
+  2.1.0
+RVM
 
 # Setup gem groups
 gem_group :test, :development do
