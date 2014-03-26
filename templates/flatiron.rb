@@ -106,6 +106,45 @@ run 'rm README.rdoc'
 # Add template data to README.md
 file 'README.md', <<-README.strip_heredoc.chomp
   # #{app_name.split(/_|-/).map(&:capitalize).join(' ')}
+
+  ## Description
+
+  Add a short description of your app.
+
+  ## Screenshots
+
+  Add some spiffy screenshots of your app here.
+
+  ## Background
+
+  Why did you want to make this app? What was your development process
+  like?
+
+  ## Features
+
+  Bullet point some of the key features of your app here.
+
+  ## Usage
+
+  How do users use your app?
+
+  ## Development/Contribution
+
+  Explain how people can contribute to your app. How should they write tests?
+  Any things in particular you'd like to see in pull requests?
+
+  ## Future
+
+  What features are you currently working on? Only mention things that you
+  actually are implementing. No pie-in-the-sky-never-gonna-happen stuff.
+
+  ## Author
+
+  Link to your blog, twitter, etc!
+
+  ## License
+
+  My Spiffy App is MIT Licensed. See LICENSE for details.
 README
 
 # Add LICENSE
@@ -327,7 +366,7 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
 end
 
 # Add STACK description file
-file 'STACK', <<-STACK.strip_heredoc.chomp
+file 'STACK.md', <<-STACK.strip_heredoc.chomp
   This generator has set up the following stack:
 
     1. Testing
@@ -349,6 +388,7 @@ file 'STACK', <<-STACK.strip_heredoc.chomp
       * Add your name and the year
     2. A README.md file has been started for you
       * Add relavent information and screenshots for your app
+      * There is a basic template you can follow, but make it your own
     3. Google Analytics is set up to track your app
       * Set up an application on Google Analytics
       * You will need to add your analytics tracking code to `config/secrets.yml`
