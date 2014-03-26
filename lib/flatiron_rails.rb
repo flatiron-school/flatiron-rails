@@ -7,8 +7,13 @@ class FlatironRails
       Usage:
         flatiron-rails <app_name>
       HELP
+    elsif ['-v', '--version'].include?(ARGV[0])
+      puts <<-VERSION.gsub(/^ {6}/, '')
+      flatiron-rails v0.0.13
+      VERSION
     else
       system("rails new #{ARGV[0]} -Tm #{FLATIRON_ROOT}/templates/flatiron.rb")
+      system("cd #{ARGV[0]}")
     end
   end
   
