@@ -385,7 +385,6 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
       * Postgres will work out of the box. No configuration necessary.
     4. Misc
       * Google Analytics
-      * New Relic
 
   TODO:
     1. An MIT License file has been created for you

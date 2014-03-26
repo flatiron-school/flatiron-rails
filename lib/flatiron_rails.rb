@@ -9,7 +9,7 @@ class FlatironRails
       HELP
     elsif ['-v', '--version'].include?(ARGV[0])
       puts <<-VERSION.gsub(/^ {6}/, '')
-      flatiron-rails v0.0.14
+      Flatiron Rails 1.0.0
       VERSION
     else
       system("rails new #{ARGV[0]} -Tm #{FLATIRON_ROOT}/templates/flatiron.rb")
