@@ -94,6 +94,7 @@ end
 gem_group :production do
   gem 'pg'
   gem 'google-analytics-rails'
+  gem 'newrelic_rpm'
   gem 'rails_12factor'
 end
 
@@ -378,10 +379,12 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
     2. Frontend
       * Bootstrap
       * Disabled Turbolinks
-      * Google Analytics
       * Precompiled assets in production
     3. Gem groups set up for easy Heroku deployment
       * Postgres will work out of the box. No configuration necessary.
+    4. Misc
+      * Google Analytics
+      * New Relic
 
   TODO:
     1. An MIT License file has been created for you
@@ -392,6 +395,10 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
     3. Google Analytics is set up to track your app
       * Set up an application on Google Analytics
       * You will need to add your analytics tracking code to `config/secrets.yml`
+    4. Sign up for a (New Relic)[http://newrelic.com/] account
+      * Follow the instructions for generating your license key
+      * Replace `config/newrelic.yml` with the one you download from New Relic
+      * Deploy your app, then connect to it from the New Relic dashboard
 
   Deploying to Heroku:
     1. `bin/setup [<app_name>]`
