@@ -345,7 +345,7 @@ depend_on_lines.each do |line|
   add_line_to_file("app/assets/stylesheets/application.css.scss", line, /\*= require_self/)
 end
 
-add_line_to_file("app/assets/stylesheets/application.css.scss", "@import \"bootstrap\";", /\*\//)
+add_line_to_file("app/assets/stylesheets/application.css.scss", "\n@import \"bootstrap\";", /\*\//)
 
 File.open("app/assets/javascripts/application.js", "r+") do |f|
   out = ""
