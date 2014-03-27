@@ -377,7 +377,7 @@ File.open("app/assets/javascripts/application.js", "r+") do |f|
     if line =~ /\/\/= require jquery/
       jquery_count += 1
       if jquery_count == 1
-        out << "//= require bootstrap\n//= require jquery\n//= require jquery_ujs\n"
+        out << "//= require jquery\n//= require jquery_ujs\n//= require bootstrap\n"
       end
     else
       out << line
