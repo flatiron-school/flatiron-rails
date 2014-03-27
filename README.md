@@ -1,5 +1,7 @@
 # Flatiron Rails
 
+## Description
+
 A Ruby on Rails application generator that sets up the default Flatiron School stack. This stack includes:
 
 1. Testing
@@ -18,3 +20,7 @@ A Ruby on Rails application generator that sets up the default Flatiron School s
   * Automatically installs Heroku command line tools if they are missing
   * For Heroku deployment, adds bin files for two-line setup and deploy
 4. Optional Devise setup
+
+## Usage
+
+`flatiron-rails new <app_name>`

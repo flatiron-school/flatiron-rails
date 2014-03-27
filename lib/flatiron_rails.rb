@@ -2,17 +2,17 @@ class FlatironRails
 
   FLATIRON_ROOT = File.expand_path('../', File.dirname(__FILE__))
   def self.run
-    if ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[1]
+    if ['-v', '--version'].include?(ARGV[0])
+      puts <<-VERSION.gsub(/^ {6}/, '')
+      Flatiron Rails 1.0.3
+      VERSION
+    elsif ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[0] != "new" || ARGV[2]
       puts <<-HELP.gsub(/^ {6}/, '')
       Usage:
-        flatiron-rails <app_name>
+        flatiron-rails new <app_name>
       HELP
-    elsif ['-v', '--version'].include?(ARGV[0])
-      puts <<-VERSION.gsub(/^ {6}/, '')
-      Flatiron Rails 1.0.2
-      VERSION
     else
-      system("rails new #{ARGV[0]} -Tm #{FLATIRON_ROOT}/templates/flatiron.rb")
+      system("rails new #{ARGV[1]} -Tm #{FLATIRON_ROOT}/templates/flatiron.rb")
     end
   end
   
