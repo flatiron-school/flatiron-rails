@@ -204,9 +204,23 @@ if yes?("Use Devise? [y/N]")
   add_secret_for(:host => 'YOUR PRODUCTION HOST URL/IP HERE', :env => 'production')
 end
 
+# Optionally set up Airbrake
+airbrake = false
+airbrake_api_key = ""
+
+if yes?("Install Airbrake for error tracking? [y/N]")
+  gem 'airbrake'
+
+  if yes?("Do you already have an api key? (If not, set one up at https://airbrake.io/account/new/Free) [y/N]")
+    airbrake_api_key = ask("What is it? (Don't worry, you can always set this up later.)")
+    airbrake = true
+  end
+end
+
 # Bundle
 system("bundle")
 
+# Install Devise
 if devise
   run('rails generate devise:install')
   if yes?("Setup user model for Devise? [y/N]")
@@ -217,6 +231,13 @@ if devise
 
     run("rails generate devise #{model_name}")
     rake("db:migrate")
+  end
+end
+
+# Install Airbrake
+if airbrake
+  if airbrake_api_key.length > 20
+    run("rails generate airbrake --api-key #{airbrake_api_key}")
   end
 end
 
@@ -395,6 +416,14 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
     3. Google Analytics is set up to track your app
       * Set up an application on Google Analytics
       * You will need to add your analytics tracking code to `config/secrets.yml`
+    4. Set up Airbrake (Optional)
+      * If you entered your api key during project creation, you're all set!
+      * Otherwise, visit [Airbrake](https://airbrake.io/account/new/Free) and set
+      up a free account.
+      * When it asks for "subdomain", it really means "username" (it's also a required
+        field, even though it doesn't seem like it)
+      * Generate your api key, then on your command line (in the project root), run:
+        `rails g airbrake --api-key your_api_key_here
 
   Deploying to Heroku:
     1. `bin/setup [<app_name>]`
