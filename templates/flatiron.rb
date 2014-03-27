@@ -174,12 +174,12 @@ file 'LICENSE', <<-MIT.strip_heredoc.chomp
   SOFTWARE.
 MIT
 
-# Set Rails version to 4.1.0.rc1
+# Set Rails version to 4.1.0.rc2
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /gem 'rails'/
-      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.0.rc1\'')}"
+      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.0.rc2\'')}"
     else
       out << line
     end

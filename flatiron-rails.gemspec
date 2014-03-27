@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'flatiron-rails'
-  s.version     = '1.0.1'
+  s.version     = '1.0.2'
   s.executables << 'flatiron-rails'
   s.date        = '2014-03-27'
   s.summary     = "flatiron-rails gem"
@@ -11,5 +11,5 @@ Gem::Specification.new do |s|
   s.homepage    =
     'http://rubygems.org/gems/flatiron-rails'
   s.license     = 'MIT'
-  s.add_runtime_dependency('rails', '>= 4.1.0.rc1')
+  s.add_runtime_dependency('rails', '>= 4.1.0.rc2')
 end
