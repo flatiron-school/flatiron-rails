@@ -268,12 +268,16 @@ File.open("spec/spec_helper.rb", "r+") do |f|
         config.include FactoryGirl::Syntax::Methods
 
         config.before(:suite) do
-          DatabaseCleaner.strategy = :transaction
           DatabaseCleaner.clean_with(:truncation)
         end
 
         config.before(:each) do
+          DatabaseCleaner.strategy = :transaction
           DatabaseCleaner.start
+        end
+
+        config.before(:each, :js => true) do
+          DatabaseCleaner.strategy = :truncation
         end
 
         config.after(:each) do
@@ -370,6 +374,27 @@ end
 
 add_line_to_file("app/assets/stylesheets/application.css.scss", "\n@import \"bootstrap\";", /\*\//)
 
+File.open("app/assets/stylesheets/application.css.scss", "a") do |f|
+  f.write <<-CSS.strip_heredoc.chomp
+    
+    /* Some Style from the Bootstrap Default Theme */
+    body {
+      padding-top: 70px;
+      padding-bottom: 30px;
+    }
+
+    .theme-dropdown .dropdown-menu {
+      position: static;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .theme-showcase > p > .btn {
+      margin: 5px 0;
+    }
+  CSS
+end
+
 File.open("app/assets/javascripts/application.js", "r+") do |f|
   out = ""
   jquery_count = 0
@@ -391,7 +416,6 @@ end
 # Add STACK description file
 file 'STACK.md', <<-STACK.strip_heredoc.chomp
   This generator has set up the following stack:
-
     1. Testing
       * RSpec
       * Capybara
@@ -408,15 +432,16 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
       * Google Analytics
 
   TODO:
-    1. An MIT License file has been created for you
+    1. Add the line `ruby '2.1.0'` to the top of your Gemfile
+    2. An MIT License file has been created for you
       * Add your name and the year
-    2. A README.md file has been started for you
+    3. A README.md file has been started for you
       * Add relavent information and screenshots for your app
       * There is a basic template you can follow, but make it your own
-    3. Google Analytics is set up to track your app
+    4. Google Analytics is set up to track your app
       * Set up an application on Google Analytics
       * You will need to add your analytics tracking code to `config/secrets.yml`
-    4. Set up Airbrake (Optional)
+    5. Set up Airbrake (Optional)
       * If you entered your api key during project creation, you're all set!
       * Otherwise, visit [Airbrake](https://airbrake.io/account/new/Free) and set
       up a free account.
