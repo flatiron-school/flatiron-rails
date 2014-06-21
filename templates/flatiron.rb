@@ -74,10 +74,10 @@ def add_line_to_file(file, line_to_add, line_to_add_after)
   end
 end
 
-# Remove sqlite3 from default gem group and set Ruby version to 2.1.0
+# Remove sqlite3 from default gem group and set Ruby version to 2.1.2
 remove_line_from_file("Gemfile", "sqlite3")
 file '.ruby-version', <<-RVM.strip_heredoc.chomp
-  2.1.0
+  2.1.2
 RVM
 
 # Setup gem groups
@@ -181,7 +181,7 @@ File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /gem 'rails'/
-      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.0rc2\'')}"
+      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.1\'')}"
     else
       out << line
     end
@@ -502,6 +502,29 @@ def setup_secrets_yml_for_ninefold
   add_secret_for(ninefold_user: 'NINEFOLD DATABASE USERNAME HERE', env: :production)
   add_secret_for(ninefold_pass: 'NINEFOLD DATABASE PASSWORD HERE', env: :production)
 end
+
+def fix_new_database_yml_for_heroku
+  File.open("config/database.yml", "r+") do |f|
+    out = ""
+    f.each do |line|
+      if line =~ /production:/
+        out << <<-DB.gsub(/^ {10}/, '')
+          production:
+            url: <%= ENV["DATABASE_URL"] %>
+        DB
+      else
+        if !out.include?('production:')
+          out << line
+        end
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end
+end
+
+fix_new_database_yml_for_heroku
 
 # Change setup for Ninefold
 if yes?("Set up for Ninefold instead of Heroku? [y/N]")
