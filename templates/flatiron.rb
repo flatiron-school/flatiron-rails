@@ -1,6 +1,8 @@
 # Prevent automatic run of bundle install
 def run_bundle ; end
 
+# TODO: Add check for postgres
+
 # Helper method to write to secrets.yml
 def add_secret_for(options)
   key = "#{options.first[0].to_s}"
@@ -179,7 +181,7 @@ File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /gem 'rails'/
-      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.0.rc2\'')}"
+      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.1\'')}"
     else
       out << line
     end
