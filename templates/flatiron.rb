@@ -181,7 +181,7 @@ File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /gem 'rails'/
-      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.1\'')}"
+      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.0rc2\'')}"
     else
       out << line
     end
