@@ -191,6 +191,21 @@ File.open("Gemfile", "r+") do |f|
   f.truncate(f.pos)
 end
 
+# Fix incorrect version of sass-rails
+File.open("Gemfile", "r+") do |f|
+  out = ""
+  f.each do |line|
+    if line =~ /gem 'sass-rails'/
+      out << "#{line.gsub(/'~> 4.0.3'/, '\'4.0.2\'')}"
+    else
+      out << line
+    end
+  end
+  f.pos = 0
+  f.print out.chomp
+  f.truncate(f.pos)
+end
+
 # Disable Turbolinks
 remove_line_from_file("Gemfile", "turbolinks")
 remove_line_from_file("app/assets/javascripts/application.js", "turbolinks")

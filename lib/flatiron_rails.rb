@@ -4,7 +4,7 @@ class FlatironRails
   def self.run
     if ['-v', '--version'].include?(ARGV[0])
       puts <<-VERSION.gsub(/^ {6}/, '')
-      Flatiron Rails 1.0.10
+      Flatiron Rails 1.0.11
       VERSION
     elsif ARGV[0].nil? || ['-h','--help'].include?(ARGV[0]) || ARGV[0] != "new" || ARGV[2]
       puts <<-HELP.gsub(/^ {6}/, '')
