@@ -269,7 +269,7 @@ generate(:"rspec:install")
 # Fix .rspec file to remove excessive warnings/properly setup
 remove_line_from_file('.rspec', '--warnings')
 remove_line_from_file('.rspec', '--require spec_helper')
-add_line_to_file('.rspec', '--format documentation', '--color')
+add_line_to_file('.rspec', "\n--format documentation", '--color')
 
 # Edit spec/rails_helper.rb
 File.open("spec/rails_helper.rb", "r+") do |f|
