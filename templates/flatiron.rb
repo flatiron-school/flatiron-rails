@@ -74,6 +74,11 @@ def add_line_to_file(file, line_to_add, line_to_add_after)
   end
 end
 
+# Get formatted app name
+def formatted_app_name
+  app_name.split(/_|-/).map(&:capitalize).join(' ')
+end
+
 # Remove sqlite3 from default gem group and set Ruby version to 2.1.2
 remove_line_from_file("Gemfile", "sqlite3")
 file '.ruby-version', <<-RVM.strip_heredoc.chomp
@@ -93,6 +98,7 @@ gem_group :test, :development do
   gem 'database_cleaner'
   gem 'sqlite3'
   gem 'pry'
+  gem 'guard-rspec', require: false
 end
 
 gem_group :production do
@@ -109,7 +115,7 @@ run 'rm README.rdoc'
 
 # Add template data to README.md
 file 'README.md', <<-README.strip_heredoc.chomp
-  # #{app_name.split(/_|-/).map(&:capitalize).join(' ')}
+  # #{formatted_app_name}
 
   ## Description
 
@@ -148,7 +154,7 @@ file 'README.md', <<-README.strip_heredoc.chomp
 
   ## License
 
-  My Spiffy App is MIT Licensed. See LICENSE for details.
+  #{formatted_app_name} is MIT Licensed. See LICENSE for details.
 README
 
 # Add LICENSE
@@ -176,12 +182,12 @@ file 'LICENSE', <<-MIT.strip_heredoc.chomp
   SOFTWARE.
 MIT
 
-# Set Rails version to 4.1.0.rc2
+# Set Rails version to 4.1.4
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /gem 'rails'/
-      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.1\'')}"
+      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.4\'')}"
     else
       out << line
     end
@@ -262,7 +268,7 @@ end
 generate(:"rspec:install")
 
 # Edit spec/spec_helper.rb
-File.open("spec/spec_helper.rb", "r+") do |f|
+File.open("spec/rails_helper.rb", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /require 'rspec\/autorun'/
