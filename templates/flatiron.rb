@@ -1,8 +1,6 @@
 # Prevent automatic run of bundle install
 def run_bundle ; end
 
-# TODO: Add check for postgres
-
 # Helper method to write to secrets.yml
 def add_secret_for(options)
   key = "#{options.first[0].to_s}"
@@ -267,7 +265,11 @@ end
 # Generate RSpec files
 generate(:"rspec:install")
 
-# Edit spec/spec_helper.rb
+# Fix .rspec file to remove excessive warnings
+remove_line_from_file('.rspec', '--warnings')
+remove_line_from_file('.rspec', '--require spec_helper')
+
+# Edit spec/rails_helper.rb
 File.open("spec/rails_helper.rb", "r+") do |f|
   out = ""
   f.each do |line|
@@ -322,7 +324,7 @@ run('touch spec/features/.keep')
 
 # Create feature_helper.rb
 file 'spec/feature_helper.rb', <<-CODE.strip_heredoc.chomp
-  require 'spec_helper'
+  require 'rails_helper'
   require 'capybara/rails'
 CODE
 
@@ -337,7 +339,7 @@ file 'Guardfile', %q(
   guard :rspec do
     watch(%r{^spec/.+_spec\.rb$})
     watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
-    watch('spec/spec_helper.rb')  { "spec" }
+    watch('spec/rails_helper.rb')  { "spec" }
 
     # Rails example
     watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }

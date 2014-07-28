@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'flatiron_rails'
+require 'postgres_checker'
+
+PostgresChecker.check
 FlatironRails.run

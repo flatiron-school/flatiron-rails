@@ -1,6 +1,6 @@
 class FlatironRails
-
   FLATIRON_ROOT = File.expand_path('../', File.dirname(__FILE__))
+  
   def self.run
     if ['-v', '--version'].include?(ARGV[0])
       puts <<-VERSION.gsub(/^ {6}/, '')
@@ -14,6 +14,5 @@ class FlatironRails
     else
       system("rails new #{ARGV[1]} -Tm #{FLATIRON_ROOT}/templates/flatiron.rb")
     end
-  end
-  
+  end 
 end
