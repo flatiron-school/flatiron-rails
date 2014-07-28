@@ -20,6 +20,7 @@ A Ruby on Rails application generator that sets up the default Flatiron School s
   * Automatically installs Heroku command line tools if they are missing
   * For Heroku deployment, adds bin files for two-line setup and deploy
 4. Optional Devise setup
+5. Airbrake integration
 
 ## Usage
 

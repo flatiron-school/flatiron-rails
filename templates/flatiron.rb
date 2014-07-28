@@ -97,6 +97,7 @@ gem_group :test, :development do
   gem 'sqlite3'
   gem 'pry'
   gem 'guard-rspec', require: false
+  gem 'thin'
 end
 
 gem_group :production do
@@ -265,9 +266,10 @@ end
 # Generate RSpec files
 generate(:"rspec:install")
 
-# Fix .rspec file to remove excessive warnings
+# Fix .rspec file to remove excessive warnings/properly setup
 remove_line_from_file('.rspec', '--warnings')
 remove_line_from_file('.rspec', '--require spec_helper')
+add_line_to_file('.rspec', '--format documentation', '--color')
 
 # Edit spec/rails_helper.rb
 File.open("spec/rails_helper.rb", "r+") do |f|
@@ -457,7 +459,7 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
       * Google Analytics
 
   TODO:
-    1. Add the line `ruby '2.1.0'` to the top of your Gemfile
+    1. Add the line `ruby '2.1.2'` to the top of your Gemfile
     2. An MIT License file has been created for you
       * Add your name and the year
     3. A README.md file has been started for you
