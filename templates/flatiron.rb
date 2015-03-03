@@ -73,11 +73,11 @@ def add_line_to_file(file, line_to_add, line_to_add_after)
 end
 
 # Helper method to add a line to a file by number
-def add_line_by_number(file, line_to_add, line_number_under_with_to_add)
+def add_line_by_number(file, line_to_add, line_number_under_which_to_add)
   File.open(file, "r+") do |f|
     out = ""
     f.each_with_index do |line, i|
-      if line_number_under_with_to_add == i + 1
+      if line_number_under_which_to_add == i + 1
         out << line + line_to_add
       else
         out << line
