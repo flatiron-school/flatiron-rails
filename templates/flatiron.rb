@@ -72,6 +72,23 @@ def add_line_to_file(file, line_to_add, line_to_add_after)
   end
 end
 
+# Helper method to add a line to a file by number
+def add_line_by_number(file, line_to_add, line_number_under_with_to_add)
+  File.open(file, "r+") do |f|
+    out = ""
+    f.each_with_index do |line, i|
+      if line_number_under_with_to_add == i + 1
+        out << line + line_to_add
+      else
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end  
+end
+
 # Get formatted app name
 def formatted_app_name
   app_name.split(/_|-/).map(&:capitalize).join(' ')
@@ -387,6 +404,10 @@ end
 inside('app/assets/stylesheets') do
   run "mv application.css application.css.scss"
 end
+
+# Asset pipeline vendor
+add_line_by_number("app/assets/stylesheets/application.css.scss", " *= require_tree ../../../vendor/assets/stylesheets/.\n", 12)
+add_line_by_number("app/assets/javascripts/application.js", "//= require_tree ../../../vendor/assets/javascripts/.\n", 14)
 
 depend_on_lines = [
   " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.svg\"\n",
