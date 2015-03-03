@@ -94,10 +94,10 @@ def formatted_app_name
   app_name.split(/_|-/).map(&:capitalize).join(' ')
 end
 
-# Remove sqlite3 from default gem group and set Ruby version to 2.1.2
+# Remove sqlite3 from default gem group and set Ruby version to 2.2.0
 remove_line_from_file("Gemfile", "sqlite3")
 file '.ruby-version', <<-RVM.strip_heredoc.chomp
-  2.1.2
+  2.2.0
 RVM
 
 # Setup gem groups
@@ -480,7 +480,7 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
       * Google Analytics
 
   TODO:
-    1. Add the line `ruby '2.1.2'` to the top of your Gemfile
+    1. Add the line `ruby '2.2.0'` to the top of your Gemfile
     2. An MIT License file has been created for you
       * Add your name and the year
     3. A README.md file has been started for you
