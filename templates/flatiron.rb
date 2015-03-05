@@ -72,15 +72,32 @@ def add_line_to_file(file, line_to_add, line_to_add_after)
   end
 end
 
+# Helper method to add a line to a file by number
+def add_line_by_number(file, line_to_add, line_number_under_which_to_add)
+  File.open(file, "r+") do |f|
+    out = ""
+    f.each_with_index do |line, i|
+      if line_number_under_which_to_add == i + 1
+        out << line + line_to_add
+      else
+        out << line
+      end
+    end
+    f.pos = 0
+    f.print out.chomp
+    f.truncate(f.pos)
+  end  
+end
+
 # Get formatted app name
 def formatted_app_name
   app_name.split(/_|-/).map(&:capitalize).join(' ')
 end
 
-# Remove sqlite3 from default gem group and set Ruby version to 2.1.2
+# Remove sqlite3 from default gem group and set Ruby version to 2.2.0
 remove_line_from_file("Gemfile", "sqlite3")
 file '.ruby-version', <<-RVM.strip_heredoc.chomp
-  2.1.2
+  2.2.0
 RVM
 
 # Setup gem groups
@@ -89,7 +106,6 @@ gem_group :test, :development do
   gem 'capybara'
   gem 'selenium-webdriver'
   gem 'better_errors'
-  gem 'sprockets_better_errors'
   gem 'binding_of_caller'
   gem 'factory_girl_rails'
   gem 'simplecov'
@@ -181,12 +197,12 @@ file 'LICENSE', <<-MIT.strip_heredoc.chomp
   SOFTWARE.
 MIT
 
-# Set Rails version to 4.1.4
+# Set Rails version to 4.2.0
 File.open("Gemfile", "r+") do |f|
   out = ""
   f.each do |line|
     if line =~ /gem 'rails'/
-      out << "#{line.gsub(/, '(.*)'/, ', \'4.1.4\'')}"
+      out << "#{line.gsub(/, '(.*)'/, ', \'4.2.0\'')}"
     else
       out << line
     end
@@ -388,6 +404,10 @@ inside('app/assets/stylesheets') do
   run "mv application.css application.css.scss"
 end
 
+# Asset pipeline vendor
+add_line_by_number("app/assets/stylesheets/application.css.scss", " *= require_tree ../../../vendor/assets/stylesheets/.\n", 12)
+add_line_by_number("app/assets/javascripts/application.js", "//= require_tree ../../../vendor/assets/javascripts/.\n", 14)
+
 depend_on_lines = [
   " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.svg\"\n",
   " //= depend_on_asset \"bootstrap/glyphicons-halflings-regular.ttf\"\n",
@@ -459,7 +479,7 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
       * Google Analytics
 
   TODO:
-    1. Add the line `ruby '2.1.2'` to the top of your Gemfile
+    1. Add the line `ruby '2.2.0'` to the top of your Gemfile
     2. An MIT License file has been created for you
       * Add your name and the year
     3. A README.md file has been started for you
