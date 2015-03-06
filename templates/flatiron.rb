@@ -498,7 +498,7 @@ file 'STACK.md', <<-STACK.strip_heredoc.chomp
         `rails g airbrake --api-key your_api_key_here
 
   Deploying to Heroku:
-    1. `bin/setup [<app_name>]`
+    1. `bin/bootstrap [<app_name>]`
       * <app_name> is optional. It will, by default, attempt to create an
       app on Heroku using your Rails application name.
     2. `bin/deploy`
@@ -577,12 +577,12 @@ if yes?("Set up for Ninefold instead of Heroku? [y/N]")
   setup_secrets_yml_for_ninefold
   remove_line_from_file("Gemfile", "rails_12factor")
 else
-  file 'bin/setup', <<-SETUP.strip_heredoc.chomp
+  file 'bin/bootstrap', <<-SETUP.strip_heredoc.chomp
     #!/usr/bin/env ruby
     if ['-h', '--help'].include?(ARGV[0]) || ARGV[1]
       puts <<-HELP.gsub(/^ {6}/, '')
       Usage:
-        bin/setup [<app_name>]
+        bin/bootstrap [<app_name>]
       HELP
     elsif ARGV[0]
       system("heroku create \#{ARGV[0]}")
@@ -598,7 +598,7 @@ else
 
     if !log.any? {|line| line.match(/heroku/)}
       puts <<-ERROR.gsub(/^ {6}/, '')
-      You must run `bin/setup` first!
+      You must run `bin/bootstrap` first!
       ERROR
     else
       system("git push heroku master && heroku run rake db:migrate && heroku open")
